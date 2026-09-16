@@ -1,40 +1,48 @@
-# Preprocessing module design
+# Preprocessing Module Design
 
-## Inputs
+## 1. Purpose
 
-One FITS image per survey/wavelength regime.
+The preprocessing module converts raw astronomical FITS observations into a consistent MATLAB representation suitable for the subsequent Digital Image Processing (DIP) stages.
 
-## Outputs
+The module is designed to be survey-independent and should work with FITS images from different astronomical surveys and wavelength regimes.
 
-Each input becomes a MATLAB struct containing:
+The preprocessing stage is limited to:
 
-- `rawData`: original floating-point image values
-- `workingData`: finite working copy for numerical algorithms
-- `normalized`: percentile-clipped image in [0, 1]
-- `validMask`: pixels that were finite in the source
-- `validation`: basic quality statistics
-- `spatial`: basic WCS/grid metadata
-- `info`: complete `fitsinfo` metadata
+- FITS data ingestion
+- Basic data validation
+- Invalid-pixel handling
+- Intensity normalization
+- Extraction of spatial/WCS metadata
+- Checking spatial compatibility between images
 
-## Functions
+Image enhancement and analysis techniques are deliberately kept outside this module and will be implemented as separate DIP stages.
 
-- `readFitsImage.m` — FITS ingestion only
-- `validateImage.m` — quality checks only
-- `prepareImage.m` — invalid-pixel handling + intensity normalization
-- `getFitsKeyword.m` — small WCS/header helper
-- `extractSpatialMetadata.m` — extract common spatial metadata
-- `checkSpatialCompatibility.m` — compare grids across surveys
-- `preprocessImage.m` — orchestrator for one file
 
-## What is intentionally not here yet
+## 2. Inputs
 
-Do not add the following to preprocessing until the experimental DIP stage is defined:
+The module accepts one FITS image per survey or wavelength regime.
 
-- histogram equalization
-- Gaussian/median/average denoising as the main experiment
-- DFT low/high-pass filtering
-- sharpening
-- morphology
-- fusion
+For the current experiment, the input datasets are:
 
-These will become separate modules so their effect can be measured independently.
+| Dataset | Survey / Wavelength Regime |
+| `Centaurus_A_DSS.fits` | DSS optical |
+| `Centaurus_A_DSS2_R.fits` | DSS2 red optical |
+| `Centaurus_A_WISE12.fits` | WISE infrared |
+| `Centaurus_A_RASS_CNT.fits` | ROSAT X-ray |
+
+The preprocessing module should not depend on these specific files. They are used as the current test dataset.
+
+## 3. Outputs
+
+Each input FITS image is represented by one element of the MATLAB `images` structure.
+
+```text
+images(k)
+│
+├── name
+├── data
+├── normalized
+├── validMask
+├── validation
+├── spatial
+└── info

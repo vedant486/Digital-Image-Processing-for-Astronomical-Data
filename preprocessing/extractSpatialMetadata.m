@@ -1,21 +1,47 @@
-function spatial = extractSpatialMetadata(img)
-%EXTRACTSPATIALMETADATA Extract common WCS/grid metadata from a FITS image.
-%
-% The values are metadata only; no registration/resampling is performed.
+function spatial = extractSpatialMetadata(info)
 
     spatial = struct();
-    info = img.info;
 
-    spatial.nRows = size(img.data, 1);
-    spatial.nCols = size(img.data, 2);
-    spatial.crval1 = getFitsKeyword(info, "CRVAL1", NaN);
-    spatial.crval2 = getFitsKeyword(info, "CRVAL2", NaN);
-    spatial.crpix1 = getFitsKeyword(info, "CRPIX1", NaN);
-    spatial.crpix2 = getFitsKeyword(info, "CRPIX2", NaN);
-    spatial.cdelt1 = getFitsKeyword(info, "CDELT1", NaN);
-    spatial.cdelt2 = getFitsKeyword(info, "CDELT2", NaN);
-    spatial.ctype1 = string(getFitsKeyword(info, "CTYPE1", ""));
-    spatial.ctype2 = string(getFitsKeyword(info, "CTYPE2", ""));
-    spatial.radesys = string(getFitsKeyword(info, "RADESYS", ""));
-    spatial.equinox = getFitsKeyword(info, "EQUINOX", NaN);
+    % Initialize fields
+    spatial.CTYPE1 = [];
+    spatial.CTYPE2 = [];
+
+    spatial.CRVAL1 = [];
+    spatial.CRVAL2 = [];
+
+    spatial.CRPIX1 = [];
+    spatial.CRPIX2 = [];
+
+    spatial.CDELT1 = [];
+    spatial.CDELT2 = [];
+
+    % FITS keyword table
+    keywords = info.PrimaryData.Keywords;
+
+    % Search for each keyword
+    spatial.CTYPE1 = getFITSKeyword(keywords, "CTYPE1");
+    spatial.CTYPE2 = getFITSKeyword(keywords, "CTYPE2");
+
+    spatial.CRVAL1 = getFITSKeyword(keywords, "CRVAL1");
+    spatial.CRVAL2 = getFITSKeyword(keywords, "CRVAL2");
+
+    spatial.CRPIX1 = getFITSKeyword(keywords, "CRPIX1");
+    spatial.CRPIX2 = getFITSKeyword(keywords, "CRPIX2");
+
+    spatial.CDELT1 = getFITSKeyword(keywords, "CDELT1");
+    spatial.CDELT2 = getFITSKeyword(keywords, "CDELT2");
+
+end
+
+
+function value = getFITSKeyword(keywords, keyword)
+
+    value = [];
+
+    row = strcmpi(string(keywords(:,1)), keyword);
+
+    if any(row)
+        value = keywords{find(row,1),2};
+    end
+
 end

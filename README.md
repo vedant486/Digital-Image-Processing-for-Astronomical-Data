@@ -50,28 +50,10 @@ analysis/        Quantitative comparison metrics
 
 ## Preprocessing design rule
 
-The preprocessing stage prepares the observations for DIP. It should not perform the
+The preprocessing stage prepares the observations for DIP. It does not perform the
 main course techniques that we intend to study experimentally, such as histogram
 equalization, DFT filtering, sharpening, or morphological processing.
 
 The original FITS numerical values are preserved. A separate normalized image is
 created for downstream image-processing/visualization use.
 
-## Running the project
-
-1. Put FITS files in `data/raw/`.
-2. Open MATLAB in the repository root.
-3. Run `main.m`.
-4. The script loads each FITS image, validates it, prepares a normalized working image,
-   and checks whether the requested output grids are compatible.
-
-## Git workflow
-
-```bash
-git init
-git add .
-git commit -m "Add modular FITS preprocessing pipeline"
-git branch -M main
-git remote add origin <YOUR_GITHUB_REPO_URL>
-git push -u origin main
-```
