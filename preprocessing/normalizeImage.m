@@ -7,7 +7,7 @@ function normalizedImage = normalizeImage(img, method)
     normalizedImage = zeros(size(img));
 
     % Extract valid pixel values
-    validPixels = img(validMask);
+    validPixels = img(validMask);%uses validMask as a vector to get the image in pixels that have valid values
 
     switch lower(method)
 
@@ -21,6 +21,28 @@ function normalizedImage = normalizeImage(img, method)
             else
                 normalizedImage(validMask) = (validPixels - minValue) / (maxValue - minValue);
             end
+
+        case "percentile"
+
+            % Robust intensity limits
+            lowValue = prctile(validPixels, 1);
+            highValue = prctile(validPixels, 99);
+
+            if highValue == lowValue
+                normalizedImage(validMask) = 0;
+            else
+
+                normalizedPixels = ...
+                    (validPixels - lowValue) / ...
+                    (highValue - lowValue);
+
+                % Clip values outside the selected range
+                normalizedPixels = ...
+                    max(min(normalizedPixels, 1), 0);
+
+                normalizedImage(validMask) = normalizedPixels;
+            end
+
 
         case "zscore"
 
